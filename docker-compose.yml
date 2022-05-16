@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  database:
+    container_name: database
+    image: 'bitnami/postgresql:latest'
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=allcantara
+    volumes:
+      - 'postgresql_data:/app/postgresql'
+
+  api:
+    container_name: api
+    build: ./api
+    command:
+      - java -jar api.jar
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api/target/api-0.0.1-SNAPSHOT.jar:/app/api/api.jar
+
+  web:
+    container_name: web
+    build: ./web
+    command:
+      - npm start
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/app/web
+
+volumes:
+  postgresql_data:
+    driver: local
